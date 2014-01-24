@@ -17,10 +17,6 @@ var conessearch = true; //Отбирать шишки у хоркьов? (true �
 var battle = true; //Бить всем щщи? (true или false)
 var coinshunt = false; //Ты чё мусор? (true или false)
 
-if(coinshunt && conessearch) {
-	alert("Нельзя ходить в разведку и в бюро одновременно.");
-}
-
 //Variables
 var sit = "http://pernatsk.ru/world/battle/search?level_from="+ minLvl +"&level_to="+ maxLvl; //Адрес поиска врагов
 var battleUrl = "http://pernatsk.ru/world/battle"; //Адрес арены
@@ -29,7 +25,6 @@ var coinsUrl = "http://pernatsk.ru/location/coinshunt"; //Адрес бюро
 var randSec = Math.floor((Math.random()*3))*1000;
 var forkUrl = "http://pernatsk.ru/location/fork"; //Адрес развилки
 var forkExitUrl = "http://pernatsk.ru/location/fork/choice/path/"+ forkExit; //Адрес выхода с развилки
-
 
 //Чтоб после развилки куда-нибудь уходить.
 if (location.href == "http://pernatsk.ru/") {
@@ -46,7 +41,6 @@ if (location.href == "http://pernatsk.ru/") {
 if (location.href == forkUrl) {
 	document.location.replace(forkExitUrl);
 }
-
 
 if (battle) {
 	if (location.href == battleUrl) {
