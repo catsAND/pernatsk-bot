@@ -76,7 +76,11 @@ if (location.href.split("http://pernatsk.ru/world/battle/log/id").length==2) {
 		}
 	},randSec);
 }
+
 if (conessearch) {
+	if ((location.href == "http://pernatsk.ru/world/battle/relax") && (document.getElementById("b-fight"))) {
+		document.location.replace(conesUrl);
+	}
 	if (location.href == conesUrl) {
 		if ((document.getElementById("b-fight") == null) && (battle)) { //Если перед разведкой таймер боя отсутствует, а мы любители подраться, то идём сначала драться
 			document.location.replace(battleUrl);
