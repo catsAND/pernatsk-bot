@@ -33,10 +33,12 @@ var forkExitUrl = "http://pernatsk.ru/location/fork/choice/path/"+ forkExit; //�
 
 //Чтоб после развилки куда-нибудь уходить.
 if (location.href == "http://pernatsk.ru/") {
-	if (battle) {
-		document.location.replace(battleUrl);
-	} else if (conessearch) {
-		document.location.replace(conesUrl);
+	if (document.getElementsByClassName("b-account-avatar")) {
+		if (battle) {
+			document.location.replace(battleUrl);
+		} else if (conessearch) {
+			document.location.replace(conesUrl);
+		}
 	}
 }
 
