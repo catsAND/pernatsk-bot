@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name pernatsk-bot
 // @domain http://pernatsk.ru/*
-// @namespace  http://pernatsk.ru/*
+// @namespace http://pernatsk.ru/*
 // @include http://pernatsk.ru/*
 // @description Ходит за шишками и бъёт других птиц.
 // @author Anonymous
@@ -52,6 +52,18 @@ function goToWork(id) {
 	$(impForm).click(); 
 }
 
+function checkHealth() {
+	for(var i=0;i<5;i++) {
+		var hp = parseInt(document.getElementsByClassName('b-progress-text g-health_percent')[0].innerText);
+	}
+	return hp;
+}
+
+var currentHp = checkHealth();
+if(currentHp < "25") {
+	alert("У вас мало здоровья. Подлечитесь.");
+}
+
 //Если попалась развилка.
 if (location.href == forkUrl) {
 	document.location.replace(forkExitUrl);
@@ -59,7 +71,7 @@ if (location.href == forkUrl) {
 
 //Чтоб после развилки куда-нибудь уходить.
 if (location.href == "http://pernatsk.ru/") {
-	if (document.getElementsByClassName("b-account-avatar")) {
+	if(document.getElementById("login-form") == null) {
 		if (battle) {
 			document.location.replace(battleUrl);
 		} else if (conesSearch) {
