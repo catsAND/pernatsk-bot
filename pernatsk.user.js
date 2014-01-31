@@ -6,17 +6,21 @@
 // @description Ходит за шишками и бъёт других птиц.
 // @author Anonymous
 // @license MIT
-// @version 0,2
+// @version 0,3beta
 // ==/UserScript==
 
 // ==Config==
 var minLvl = 3; //Минимальный уровень кого бить
 var maxLvl = 6; //Максимальный уровень кого бить
-var forkExit = "hollow"; //Убегать от воронов (west, east, hollow)
-var conesSearch = true; //Отбирать шишки у хоркьов? (true или false)
+var minHp = "15" //Минимально допустимое здоровье. (В процентах)
+var forkExit = "hollow"; //Убегать от воронов (west, east, hollow, back)
 var battle = true; //Бить всем щщи? (true или false)
+var conesSearch = true; //Отбирать шишки у хоркьов? (true или false)
+var conesSearchId = "0"; //0 - 6мин шишки, 1 - бинокль ИЛИ разведданные, если у вас бинокль И разведданные, то 1 - бинокль, 2 - разведданые.
 var coinsHunt = false; //Ты чё мусор? (true или false)
 var coinsHuntId = "0"; //0 - 10мин задание, 1 - 20мин задание
+var autoHeal = false; //Без комментариев. (true или false)
+var buyHeal = false; //Покупать подорожник? (true или false) (Если autoHeal выключен, то автопокупка не будет работать)
 // ==/Config==
 
 // ==Variables==
@@ -27,6 +31,8 @@ var conesUrl = "http://pernatsk.ru/location/conessearch"; //Адрес разв�
 var coinsUrl = "http://pernatsk.ru/location/coinshunt"; //Адрес бюро
 var forkUrl = "http://pernatsk.ru/location/fork"; //Адрес развилки
 var forkExitUrl = "http://pernatsk.ru/location/fork/choice/path/"+ forkExit; //Адрес выхода с развилки
+var shopUrl = "http://pernatsk.ru/location/shop"; //Адрес базара
+var generalUrl = "http://pernatsk.ru/nest/bird" //Адрес персонажа
 // ==/Variables==
 
 function stat() {
@@ -42,47 +48,7 @@ function stat() {
 	} else stat();
 }
 
-function goToSearch() {
-	var impForm = document.getElementsByClassName("butt_action important");
-	$(impForm).click();
-}
-
-function goToWork(id) {
-	var impForm = document.getElementsByClassName("butt_action inline important")[id]; 
-	$(impForm).click(); 
-}
-
-function checkHealth() {
-	for(var i=0;i<5;i++) {
-		var hp = parseInt(document.getElementsByClassName('b-progress-text g-health_percent')[0].innerText);
-	}
-	return hp;
-}
-
-var currentHp = checkHealth();
-if(currentHp < "25") {
-	alert("У вас мало здоровья. Подлечитесь.");
-}
-
-//Если попалась развилка.
-if (location.href == forkUrl) {
-	document.location.replace(forkExitUrl);
-}
-
-//Чтоб после развилки куда-нибудь уходить.
-if (location.href == "http://pernatsk.ru/") {
-	if(document.getElementById("login-form") == null) {
-		if (battle) {
-			document.location.replace(battleUrl);
-		} else if (conesSearch) {
-			document.location.replace(conesUrl);
-		} else if (coinsHunt) {
-			document.location.replace(coinsUrl);
-		}
-	}
-}
-
-if (location.href.split("http://pernatsk.ru/world/battle/log/id").length==2) {
+function redirect() {
 	if ((conesSearch) && (coinsHunt)) {
 		var next =  Math.floor((Math.random()*2));
 		if (next == "0") {
@@ -97,6 +63,45 @@ if (location.href.split("http://pernatsk.ru/world/battle/log/id").length==2) {
 	} else if (coinsHunt) {
 		document.location.replace(coinsUrl);
 	}
+}
+
+function goToSearch(id) {
+	var impForm = document.getElementsByClassName("butt_action important")[id].click();
+}
+
+function goToWork(id) {
+	var impForm = document.getElementsByClassName("butt_action inline important")[id].click(); 
+}
+
+function checkHealth() {
+	for(var i=0;i<5;i++) {
+		var hp = parseInt(document.getElementsByClassName('b-progress-text g-health_percent')[0].innerText);
+	}
+	return hp;
+}
+var currentHp = checkHealth();
+
+function buyingHeal() {
+	if (location.href == shopUrl && buyHeal) {
+		var impForm = document.getElementsByClassName('butt_mid important')[2].click();
+	}
+	if (location.href == "http://pernatsk.ru/location/shop/index/type/1/item/79") {
+		document.location.replace(generalUrl)
+	}
+}
+
+if (location.href == forkUrl) { //Если попалась развилка.
+	document.location.replace(forkExitUrl);
+}
+
+if (location.href == "http://pernatsk.ru/") { //Чтоб после развилки куда-нибудь уходить.
+	if(document.getElementById("login-form") == null) {
+		redirect();
+	}
+}
+
+if (location.href.split("http://pernatsk.ru/world/battle/log/id").length==2) {
+	redirect();
 }
 
 if (battle) {
@@ -135,7 +140,7 @@ if (conesSearch) { //Поиск шишек
 			document.location.replace(coinsUrl);
 		}
 		if ((document.getElementById("timer_work") == null) && (document.getElementById("b-work") == null)) { //Если нет преград, идём за шишками
-			goToSearch();
+			goToSearch(conesSearchId);
 		}
 	}
 }
@@ -159,5 +164,30 @@ if (coinsHunt) { //Нудная работа в бюро
 		if ((document.getElementById("timer_work") == null) && (document.getElementById("b-work") == null)) {
 			goToWork(coinsHuntId);
 		}
+	}
+}
+
+if (autoHeal) {
+	if (currentHp < minHp) { //Если hp меньше, чем нужно
+		if (buyHeal) { //Покупаем хилку
+			document.location.replace(shopUrl);
+			buyingHeal();
+		}
+		if (location.href == generalUrl) {
+			var healing = true;
+			var i = 0;
+			while (healing) {
+				var finding = document.getElementsByClassName('use')[i].innerText; //Смотрим, что написано на кнопке
+				if (finding == "выпить") { //Первую попавшую бутылку, выпиваем
+					var href = document.getElementsByClassName('use')[i].href; //Получаем url, чтоб выпить хилку
+					healing = false;
+					document.location.replace(href);
+				}
+				i++;
+			}
+		}
+	}
+	if (location.href == generalUrl) {
+		redirect();
 	}
 }
