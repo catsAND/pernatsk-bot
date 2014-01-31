@@ -4,7 +4,7 @@
 // @namespace http://pernatsk.ru/*
 // @include http://pernatsk.ru/*
 // @description Ходит за шишками и бъёт других птиц.
-// @author Anonymous
+// @author Пернатый Анонимус
 // @license MIT
 // @version 0,3beta
 // ==/UserScript==
@@ -173,6 +173,9 @@ if (autoHeal) {
 			document.location.replace(shopUrl);
 			buyingHeal();
 		}
+		if (location.href != generalUrl) {
+			document.location.replace(generalUrl);
+		}
 		if (location.href == generalUrl) {
 			var healing = true;
 			var i = 0;
@@ -187,7 +190,9 @@ if (autoHeal) {
 			}
 		}
 	}
-	if (location.href == generalUrl) {
-		redirect();
+	if (currentHp >= minHp) {
+		if (location.href == generalUrl) {
+			redirect();
+		}
 	}
 }
