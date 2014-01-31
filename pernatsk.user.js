@@ -12,7 +12,7 @@
 // ==Config==
 var minLvl = 3; //Минимальный уровень кого бить
 var maxLvl = 6; //Максимальный уровень кого бить
-var minHp = "15" //Минимально допустимое здоровье. (В процентах)
+var minHp = 15 //Минимально допустимое здоровье. (В процентах)
 var forkExit = "hollow"; //Убегать от воронов (west, east, hollow, back)
 var battle = true; //Бить всем щщи? (true или false)
 var conesSearch = true; //Отбирать шишки у хоркьов? (true или false)
