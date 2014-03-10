@@ -6,7 +6,7 @@
 // @description Ходит по своим делам и бъёт других птиц.
 // @author Пернатый Анонимус
 // @license copyleft
-// @version 1.0
+// @version 1.1
 // @grant none
 // ==/UserScript==
 
@@ -49,7 +49,7 @@ conf = {
 	},
 };
 // ==/Config==
-if (conf.debug) console.log("==Debug p-bot v1.0==");
+if (conf.debug) console.log("==Debug p-bot v1.1==");
 // ==Constants==
 var returnValue = false;
 var wTimer = $("span#b-work")[0];
@@ -71,7 +71,7 @@ function l(sms) {
 	}
 }
 
-//Телепортирует пернатого в указуную точку города.
+//Телепортирует пернатого в указанную точку города.
 function t(destination) { 
 	$(location).attr("href", destination);
 	l("Прыг-cкок "+ destination);
@@ -170,11 +170,16 @@ function attack() {
 	return returnValue;
 }
 
-//Выбераем чем сейчас займемся.
+//Выбираем чем сейчас займемся.
 function init() {
 	if (!battle() && !wTimer) {
 		if (sessionStorage.getItem("Work") != null)
 			working(sessionStorage.getItem("Work"));
+		else if (sessionStorage.getItem("Work") == null && conf.battle.allow && ($(location).attr("href").indexOf("/world/battle/log")>1)) {
+			setTimeout(function() {
+				sessionStorage.setItem("Wait", 1);
+				t("/world/battle");
+			}, 21345);
 	}
 }
 
@@ -187,6 +192,7 @@ function working(workName) {
 			if (isNaN($(".counts b")[1].textContent) && isNaN($(".counts b")[3].textContent)) {
 				l("Тащумба жмот!");
 				workName = conf.coins.next;
+				t(conf[workName].url);
 				}
 		}
 		l("Тратим время на "+ workName);
@@ -232,10 +238,11 @@ $(function() {
 					else {
 						if (conf.fork.type == 4)
 							conf.fork.type = parseInt((Math.random()*3),10);
+						sessionStorage.removeItem("Wait");
 						t(conf.fork.url+"/choice/path/"+conf.fork.paths[conf.fork.type]);
 					}
 				}
-				sessionStorage.setItem("Wait", 0);
+				sessionStorage.removeItem("Wait");
 				init();
 			}, randomTime);
 		} else
@@ -244,15 +251,15 @@ $(function() {
 });
 
 if (sessionStorage.getItem("BotStatus") == "on" && sessionStorage.getItem("Work") != null)
-	var status = "<a href='javascript:sessionStorage.setItem(\"BotStatus\",\"off\");t(\"/\");' style='color:green;'>работает</a>.<br> Работа: "+sessionStorage.getItem("Work");
+	var status = "<a onclick='sessionStorage.removeItem(\"BotStatus\");t(\"/\");' title='Выключить бота' style='color:green;cursor:pointer;'>работает</a>.<br> Работа: "+sessionStorage.getItem("Work");
 	else if (sessionStorage.getItem("BotStatus") == "on" && sessionStorage.getItem("Work") == null)
-	var status = "<span style='color:red;'>ожидание выбора работу.</span>.";
+	var status = "<a onclick='sessionStorage.removeItem(\"BotStatus\");t(\"/\");' title='Выключить бота' style='color:red;cursor:pointer;'>ожидание выбора работу.</a>.";
 else
-	var status = "<a href='javascript:sessionStorage.setItem(\"BotStatus\",\"on\");t(\"/\");' style='color:red;'>выключен</a>.";
-$('#version').html("<b><a href='https://github.com/catsAND/pernatsk-bot/' style='color:#fff;text-decoration:none;' target='_blank'>p-bot v1.0</a> cтатус:</b> "+status);
+	var status = "<a onclick='sessionStorage.setItem(\"BotStatus\",\"on\");t(\"/\");' title='Включить бота' style='color:red;cursor:pointer;'>выключен</a>.";
+$('#version').html("<b><a href='https://github.com/catsAND/pernatsk-bot/' style='color:#fff;text-decoration:none;' target='_blank'>p-bot v1.1</a> cтатус:</b> "+status);
 if (sessionStorage.getItem("BotStatus") == "on") {
-	$('.b-sb-place-list').append('<div class="b-sb-place-item"><b><a href="https://github.com/catsAND/pernatsk-bot/" style="color:#000;" target="_blank">p-bot v1.0</a> меню</b>:<br> <a onclick="sessionStorage.removeItem(\'Work\');" style="cursor:pointer;"><div class="g41-icons i41-battle null" title="Сидеть без работы."></div></a>  <a onclick="sessionStorage.setItem(\'Work\', \'cones\');t(conf.cones.url);" style="cursor:pointer;"><div class="g41-icons i41-conessearch cones" title="Ходить воровать у Рублика."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'coins\');t(conf.coins.url);" style="cursor:pointer;"><div class="g41-icons i41-coinshunt coins" title="Ходить отбирать монеты."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'tech\');t(conf.tech.url);" style="cursor:pointer;"><div class="g31-icons i31-construct tech" title="Мешаться под ногами у Джа."></div></a><br><a onclick="sessionStorage.setItem(\'Playing\', \'true\');t(\'/\');" style="cursor:pointer;"><div class="g31-icons i31-conesgame" title="Отдать все шишки Бублику."></div></a></div>');
+	$('.b-sb-place-list').append('<div class="b-sb-place-item"><b><a href="https://github.com/catsAND/pernatsk-bot/" style="color:#000;" target="_blank">p-bot v1.1</a> меню</b>:<br> <a onclick="sessionStorage.removeItem(\'Work\');" style="cursor:pointer;"><div class="g41-icons i41-battle null" title="Только воевать."></div></a>  <a onclick="sessionStorage.setItem(\'Work\', \'cones\');t(conf.cones.url);" style="cursor:pointer;"><div class="g41-icons i41-conessearch cones" title="Ходить воровать у Рублика."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'coins\');t(conf.coins.url);" style="cursor:pointer;"><div class="g41-icons i41-coinshunt coins" title="Ходить отбирать монеты."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'tech\');t(conf.tech.url);" style="cursor:pointer;"><div class="g31-icons i31-construct tech" title="Мешаться под ногами у Джа."></div></a><br><a onclick="sessionStorage.setItem(\'Playing\', \'true\');t(\'/\');" style="cursor:pointer;"><div class="g31-icons i31-conesgame" title="Отдать все шишки Бублику."></div></a></div>');
 	$('.'+sessionStorage.getItem("Work")).css({"border":"1px solid","border-color":"#D1AC7D"})
 }
 if (conf.debug && sessionStorage.getItem("BotStatus") != "on") console.log("Бот выключен.");
-if (conf.debug) console.log("==/Debug p-bot v1.0==");
+if (conf.debug) console.log("==/Debug p-bot v1.1==");
