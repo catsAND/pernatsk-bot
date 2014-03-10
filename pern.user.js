@@ -5,7 +5,7 @@
 // @include http://pernatsk.ru/*
 // @description Ходит по своим делам и бъёт других птиц.
 // @author Пернатый Анонимус
-// @license MIT
+// @license copyleft
 // @version 1.0
 // @grant none
 // ==/UserScript==
