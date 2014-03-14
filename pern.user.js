@@ -13,6 +13,7 @@
 // ==Config==
 conf = {
 	debug: false,
+	delay: 9, //Сколько минут ждать.
 	fork : { //Опции для развилки.
 		allow: true, //Искать банду воронов Железяки?
 		type : 4, //Пути отхода. (0 - west, 1 - east, 2 - hollow, 3 - back, 4 - random)
@@ -26,12 +27,10 @@ conf = {
 		race: "all", // 1 - совы, 2 - попугаи, 3 - орлы! "all" - всех!
 		minLvl: 3, //Минимальный уровень поиска птиц.
 		maxLvl: 4, //Максимальный уровень поиска птиц.
-		minEnemyStats: 10, //Минимальная сумма всех статов для нападения.
-		maxEnemyStats: 100, //Максимальная сумма всех статов для нападения.
 		url: "/world/battle",
 		comrades: { //Список товарищей и врагов народа. (true - наш товарищ, false - наш враг.)
-			"Нечто"     : true,
-			"десско"    : false,
+			"Нечто"  : true,
+			"десско" : false,
 		},
 	},
 	cones: { //Опции для поиска шишек.
@@ -49,9 +48,8 @@ conf = {
 	},
 };
 // ==/Config==
-if (conf.debug) console.log("==Debug p-bot v1.1==");
+if (conf.debug) console.log("==Debug p-bot v1.2==");
 // ==Constants==
-var returnValue = false;
 var wTimer = $("span#b-work")[0];
 var fTimer = $("span#b-fight")[0];
 var iTimer = $("span#b-immun")[0];
@@ -63,18 +61,18 @@ var currentCones = $('.g-cones')[0].textContent.replace(/\s\s?/g, '');
 // ==/Constants==
 
 //Логирование действий.
-function l(sms) {
+function l(s) {
 	if (conf.debug) {
 		console.log("Адрес    : " + GPS);
 		console.log("Работа   : " + sessionStorage.getItem("Work"));
-		console.log("Сообщение:\n	" + sms);
+		console.log("Сообщение:\n	" + s);
 	}
 }
 
 //Телепортирует пернатого в указанную точку города.
-function t(destination) { 
-	$(location).attr("href", destination);
-	l("Прыг-cкок "+ destination);
+function t(e) { 
+	$(location).attr("href", e);
+	l("Прыг-cкок "+ e);
 }
 
 //Функция тырканья по кнопке.
@@ -82,17 +80,18 @@ function bc(id) { $("button.important")[id].click(); }
 
 //Проверяет товарищ ли он нам.
 function checkComrade(pos) {
-	$.each(conf.battle.comrades, function(key, value) {
-		if (value && $(".sch-name .i_lvl")[pos].previousSibling.textContent == key) {
-			l("Здравствуй товарищ "+key);
-			returnValue = true;
-		}
-	});
+	var returnValue = false;
+	var val = $(".sch-name .i_lvl")[p].previousSibling.textContent;
+	if (val in conf.battle.comrades) {
+		l("Здравствуй товарищ "+val);
+		returnValue = true;
+	}
 	return returnValue;
 }
 
 //Ищет врагов среди чужих.
 function checkEnemy() {
+	var returnValue = false;
 	$.each(conf.battle.comrades, function(key, value) {
 		if (!value) {
 			if ($('div.sch-name:contains("'+key+'")').size() > 0) {
@@ -107,6 +106,7 @@ function checkEnemy() {
 
 //Функция инициализации боя.
 function battle() {
+	var returnValue = false;
 	if (conf.battle.allow && !wTimer && !fTimer) {
 		if (GPS != conf.battle.url && GPS != "/world/battle/search") {
 			l("В бой!");
@@ -141,31 +141,32 @@ function fighting() {
 	}
 }
 
-//Функция атаки на другого пернатого.
-function attack() {
-	for(var i=0,s=0,k=0,le=$("button").length;i<le;i++) {
-		if (le == 1) bc(0);
-		for(var j=0;j<5;j++) {
-			if (isNaN(parseInt($('.digit')[k].textContent))) {
-				bc(i);
-				returnValue = true;
-				break;
-			} else
-				s += parseInt($('.digit')[k].textContent);
-			k++;
-		}
-		if (s <= conf.battle.maxEnemyStats && s >= conf.battle.minEnemyStats) {
-			if (!checkComrade(i)) {
-				l("Общипаваем "+ $(".sch-name .i_lvl")[i].previousSibling.textContent +". Сумма статов: "+ s);
-				bc(i);
-				returnValue = true;
-				break;
-			} else {
-				returnValue = false;
+//Функция получения статов противников.
+function getStats() {
+	var returnValue = false;
+	for(var i=0,s=0,j=0;i<$("button.important").length*5;i++) {
+		s+=parseInt($(".progress")[i].style.width);
+		if (i == 4 || i == 9 || i == 14 || i == 19) {
+			if(s/5 > 50 || s == 0) {
+				returnValue = j;
 				break;
 			}
+			s=0,j++;
 		}
-		s = 0;
+	}
+	return returnValue;
+}
+
+//Функция атаки на другого пернатого.
+function attack() {
+	var returnValue = false;
+	var id = getStats();
+	if (id !== false) {
+		if (!checkComrade(id)) {
+			l("Ощипываем "+ $(".sch-name .i_lvl")[id].previousSibling.textContent);
+			bc(id);
+			returnValue = true;
+		}
 	}
 	return returnValue;
 }
@@ -180,6 +181,7 @@ function init() {
 				sessionStorage.setItem("Wait", 1);
 				t("/world/battle");
 			}, 21345);
+		}
 	}
 }
 
@@ -227,9 +229,8 @@ $(function() {
 	if (sessionStorage.getItem("BotStatus") == "on") {
 		if (sessionStorage.getItem("Playing"))
 			game_cones();
-		if (sessionStorage.getItem("Wait") == 1 && !wTimer) {
-			var randomTime = Math.floor(Math.random()*600000)+60000;
-			l(randomTime);
+		if (sessionStorage.getItem("Wait") == 1) {
+			var randomTime = parseInt(Math.random()*60000*conf.delay,10);
 			setTimeout(function() {
 				if($('.r-ico-fork')[0] && conf.fork.allow && GPS != "/lightning/mail/notifications") {
 					l("Где я? Кто я?");
@@ -237,7 +238,7 @@ $(function() {
 						t(conf.fork.url);
 					else {
 						if (conf.fork.type == 4)
-							conf.fork.type = parseInt((Math.random()*3),10);
+							conf.fork.type = parseInt(Math.random()*3,10);
 						sessionStorage.removeItem("Wait");
 						t(conf.fork.url+"/choice/path/"+conf.fork.paths[conf.fork.type]);
 					}
@@ -256,10 +257,10 @@ if (sessionStorage.getItem("BotStatus") == "on" && sessionStorage.getItem("Work"
 	var status = "<a onclick='sessionStorage.removeItem(\"BotStatus\");t(\"/\");' title='Выключить бота' style='color:red;cursor:pointer;'>ожидание выбора работу.</a>.";
 else
 	var status = "<a onclick='sessionStorage.setItem(\"BotStatus\",\"on\");t(\"/\");' title='Включить бота' style='color:red;cursor:pointer;'>выключен</a>.";
-$('#version').html("<b><a href='https://github.com/catsAND/pernatsk-bot/' style='color:#fff;text-decoration:none;' target='_blank'>p-bot v1.1</a> cтатус:</b> "+status);
+$('#version').html("<b><a href='https://github.com/catsAND/pernatsk-bot/' style='color:#fff;text-decoration:none;' target='_blank'>p-bot v1.2</a> cтатус:</b> "+status);
 if (sessionStorage.getItem("BotStatus") == "on") {
-	$('.b-sb-place-list').append('<div class="b-sb-place-item"><b><a href="https://github.com/catsAND/pernatsk-bot/" style="color:#000;" target="_blank">p-bot v1.1</a> меню</b>:<br> <a onclick="sessionStorage.removeItem(\'Work\');" style="cursor:pointer;"><div class="g41-icons i41-battle null" title="Только воевать."></div></a>  <a onclick="sessionStorage.setItem(\'Work\', \'cones\');t(conf.cones.url);" style="cursor:pointer;"><div class="g41-icons i41-conessearch cones" title="Ходить воровать у Рублика."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'coins\');t(conf.coins.url);" style="cursor:pointer;"><div class="g41-icons i41-coinshunt coins" title="Ходить отбирать монеты."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'tech\');t(conf.tech.url);" style="cursor:pointer;"><div class="g31-icons i31-construct tech" title="Мешаться под ногами у Джа."></div></a><br><a onclick="sessionStorage.setItem(\'Playing\', \'true\');t(\'/\');" style="cursor:pointer;"><div class="g31-icons i31-conesgame" title="Отдать все шишки Бублику."></div></a></div>');
+	$('.b-sb-place-list').append('<div class="b-sb-place-item"><b><a href="https://github.com/catsAND/pernatsk-bot/" style="color:#000;" target="_blank">p-bot v1.2</a> меню</b>:<br> <a onclick="sessionStorage.removeItem(\'Work\');" style="cursor:pointer;"><div class="g41-icons i41-battle null" title="Только воевать."></div></a>  <a onclick="sessionStorage.setItem(\'Work\', \'cones\');t(conf.cones.url);" style="cursor:pointer;"><div class="g41-icons i41-conessearch cones" title="Ходить воровать у Рублика."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'coins\');t(conf.coins.url);" style="cursor:pointer;"><div class="g41-icons i41-coinshunt coins" title="Ходить отбирать монеты."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'tech\');t(conf.tech.url);" style="cursor:pointer;"><div class="g31-icons i31-construct tech" title="Мешаться под ногами у Джа."></div></a><br><a onclick="sessionStorage.setItem(\'Playing\', \'true\');t(\'/\');" style="cursor:pointer;"><div class="g31-icons i31-conesgame" title="Отдать все шишки Бублику."></div></a></div>');
 	$('.'+sessionStorage.getItem("Work")).css({"border":"1px solid","border-color":"#D1AC7D"})
 }
 if (conf.debug && sessionStorage.getItem("BotStatus") != "on") console.log("Бот выключен.");
-if (conf.debug) console.log("==/Debug p-bot v1.1==");
+if (conf.debug) console.log("==/Debug p-bot v1.2==");
