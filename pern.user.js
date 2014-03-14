@@ -79,7 +79,7 @@ function t(e) {
 function bc(id) { $("button.important")[id].click(); }
 
 //Проверяет товарищ ли он нам.
-function checkComrade(pos) {
+function checkComrade(p) {
 	var returnValue = false;
 	var val = $(".sch-name .i_lvl")[p].previousSibling.textContent;
 	if (val in conf.battle.comrades) {
