@@ -6,7 +6,7 @@
 // @description Ходит по своим делам и бъёт других птиц.
 // @author Пернатый Анонимус
 // @license copyleft
-// @version 1.1
+// @version 1.2
 // @grant none
 // ==/UserScript==
 
