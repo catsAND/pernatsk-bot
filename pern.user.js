@@ -243,7 +243,8 @@ $(function() {
 						t(conf.fork.url+"/choice/path/"+conf.fork.paths[conf.fork.type]);
 					}
 				}
-				sessionStorage.removeItem("Wait");
+				if (!wTimer)
+					sessionStorage.removeItem("Wait");
 				init();
 			}, randomTime);
 		} else
