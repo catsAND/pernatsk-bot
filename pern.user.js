@@ -3,6 +3,9 @@
 // @domain http://pernatsk.ru/*
 // @namespace http://pernatsk.ru/*
 // @include http://pernatsk.ru/*
+// @exclude http://pernatsk.ru/location/fleamarket
+// @exclude http://pernatsk.ru/location/fleamarket/*
+// @require http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @description Ходит по своим делам и бъёт других птиц.
 // @author Пернатый Анонимус
 // @license copyleft
