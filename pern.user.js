@@ -95,7 +95,7 @@ function init() {
 		if (!autoHealing())
 			conf.battle.allow = false;
 	}
-	if (!battle() && !wTimer) {
+	else if (!battle() && !wTimer) {
 		if (sessionStorage.getItem("Work") != null)
 			working(sessionStorage.getItem("Work"));
 		else if (sessionStorage.getItem("Work") == null && conf.battle.allow && ($(location).attr("href").indexOf("/world/battle/log")>1)) {
