@@ -9,7 +9,7 @@
 // @description Ходит по своим делам и бъёт других птиц.
 // @author Пернатый Анонимус
 // @license copyleft
-// @version 2.0
+// @version 2.1
 // @grant none
 // ==/UserScript==
 
@@ -59,7 +59,7 @@ conf = {
 	},
 };
 // ==/Config==
-if (conf.debug) console.log("==Debug p-bot v2.0==");
+if (conf.debug) console.log("==Debug p-bot v2.1==");
 // ==Constants==
 var wTimer = !!($("span#b-work")[0]);
 var fTimer = !!($("span#b-fight")[0]);
@@ -205,13 +205,11 @@ function working(workName) {
 	if (GPS != conf[workName].url)
 		t(conf[workName].url);
 	else {
-		if (workName == "coins") {
-			if (isNaN($(".counts b")[1].textContent) && isNaN($(".counts b")[3].textContent)) {
-				l("Тащумба жмот!");
-				workName = conf.coins.next;
-				sessionStorage.setItem("Work", workName);
-				t(conf[workName].url);
-			}
+		if (workName == "coins" && isNaN($(".counts b")[1].textContent) && isNaN($(".counts b")[3].textContent)) {
+			l("Тащумба жмот!");
+			workName = conf.coins.next;
+			sessionStorage.setItem("Work", workName);
+			t(conf[workName].url);
 		} else {
 			l("Тратим время на "+ workName);
 			sessionStorage.setItem("Wait", 1);
@@ -301,9 +299,9 @@ if (sessionStorage.getItem("BotStatus") == "on" && sessionStorage.getItem("Work"
 	var status = "<a onclick='sessionStorage.removeItem(\"BotStatus\");t(\"/\");' title='Выключить бота' style='color:red;cursor:pointer;'>ожидание выбора работы.</a>.";
 else
 	var status = "<a onclick='sessionStorage.setItem(\"BotStatus\",\"on\");t(\"/\");' title='Включить бота' style='color:red;cursor:pointer;'>выключен</a>.";
-$('#version').html("<b><a href='https://github.com/catsAND/pernatsk-bot/' style='color:#fff;text-decoration:none;' target='_blank'>p-bot v2.0</a> cтатус:</b> "+status);
+$('#version').html("<b><a href='https://github.com/catsAND/pernatsk-bot/' style='color:#fff;text-decoration:none;' target='_blank'>p-bot v2.1</a> cтатус:</b> "+status);
 if (sessionStorage.getItem("BotStatus") == "on") {
-	$('.b-sb-place-list').append('<div class="b-sb-place-item"><b><a href="https://github.com/catsAND/pernatsk-bot/" style="color:#000;" target="_blank">p-bot v2.0</a> меню</b>:<br> <a onclick="sessionStorage.removeItem(\'Work\');" style="cursor:pointer;"><div class="g41-icons i41-battle null" title="Только воевать."></div></a>  <a onclick="sessionStorage.setItem(\'Work\', \'cones\');t(conf.cones.url);" style="cursor:pointer;"><div class="g41-icons i41-conessearch cones" title="Ходить воровать у Рублика."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'coins\');t(conf.coins.url);" style="cursor:pointer;"><div class="g41-icons i41-coinshunt coins" title="Ходить отбирать монеты."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'tech\');t(conf.tech.url);" style="cursor:pointer;"><div class="g31-icons i31-construct tech" title="Мешаться под ногами у Джа."></div></a><br><a onclick="sessionStorage.setItem(\'Playing\', \'true\');t(\'/\');" style="cursor:pointer;"><div class="g31-icons i31-conesgame" title="Отдать все шишки Бублику."></div></a></div>');
+	$('.b-sb-place-list').append('<div class="b-sb-place-item"><b><a href="https://github.com/catsAND/pernatsk-bot/" style="color:#000;" target="_blank">p-bot v2.1</a> меню</b>:<br> <a onclick="sessionStorage.removeItem(\'Work\');" style="cursor:pointer;"><div class="g41-icons i41-battle null" title="Только воевать."></div></a>  <a onclick="sessionStorage.setItem(\'Work\', \'cones\');t(conf.cones.url);" style="cursor:pointer;"><div class="g41-icons i41-conessearch cones" title="Ходить воровать у Рублика."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'coins\');t(conf.coins.url);" style="cursor:pointer;"><div class="g41-icons i41-coinshunt coins" title="Ходить отбирать монеты."></div></a> <a onclick="sessionStorage.setItem(\'Work\', \'tech\');t(conf.tech.url);" style="cursor:pointer;"><div class="g31-icons i31-construct tech" title="Мешаться под ногами у Джа."></div></a><br><a onclick="sessionStorage.setItem(\'Playing\', \'true\');t(\'/\');" style="cursor:pointer;"><div class="g31-icons i31-conesgame" title="Отдать все шишки Бублику."></div></a></div>');
 	$('.'+sessionStorage.getItem("Work")).css({"border":"1px solid","border-color":"#D1AC7D"})
 }
 if (conf.debug && sessionStorage.getItem("BotStatus") != "on") console.log("Сообщение:\n	Бот выключен.");
