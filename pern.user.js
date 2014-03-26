@@ -206,10 +206,16 @@ function working(workName) {
 		t(conf[workName].url);
 	else {
 		if (workName == "coins" && isNaN($(".counts b")[1].textContent) && isNaN($(".counts b")[3].textContent)) {
-			l("Тащумба жмот!");
-			workName = conf.coins.next;
-			sessionStorage.setItem("Work", workName);
-			t(conf[workName].url);
+			if (conf.coins.next != "coins") {
+				l("Тащумба жмот!");
+				workName = conf.coins.next;
+				sessionStorage.setItem("Work", workName);
+				t(conf[workName].url);
+			} else {
+				l("Тратим время на "+ workName);
+				sessionStorage.setItem("Wait", 1);
+				bc(conf[workName].type);
+			}
 		} else {
 			l("Тратим время на "+ workName);
 			sessionStorage.setItem("Wait", 1);
